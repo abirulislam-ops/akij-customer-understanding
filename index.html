@@ -7,8 +7,9 @@
 <style>
 :root{--navy:#1F4E78;--navy2:#16395a;--accent:#2E74B5;--line:#dbe4ec;--muted:#6b7a8a;--bg:#eef2f7}
 *{box-sizing:border-box}
-body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#1a2733;font-size:14px}
-.topbar{position:sticky;top:0;z-index:50;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:10px 18px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+html,body{height:100%}
+body{margin:0;display:flex;flex-direction:column;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color:#1a2733;font-size:14px}
+.topbar{flex:0 0 auto;z-index:50;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;padding:10px 18px;box-shadow:0 2px 8px rgba(0,0,0,.18)}
 .topbar h1{margin:0 0 8px;font-size:17px}
 .nav{display:flex;gap:6px;flex-wrap:wrap}
 .nav-btn{border:none;background:rgba(255,255,255,.12);color:#fff;padding:7px 13px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;display:inline-flex;align-items:center;gap:7px;transition:.15s}
@@ -16,8 +17,10 @@ body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color
 .nav-btn.active{background:#fff;color:var(--navy)}
 .nb-num{width:18px;height:18px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;display:inline-flex;align-items:center;justify-content:center}
 .nav-btn.active .nb-num{background:var(--navy)}
-.panel{display:none}
+.main{flex:1 1 auto;min-height:0;position:relative}
+.panel{display:none;position:absolute;inset:0}
 .panel.active{display:block}
+#panel-0{overflow:auto}
 .wrap{max-width:1180px;margin:0 auto;padding:22px}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:18px 0}
 .kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:center;box-shadow:0 1px 2px rgba(20,40,60,.05)}
@@ -41,9 +44,11 @@ body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color
 .chip .cv{display:block;font-weight:800;color:var(--navy2);font-size:14px}
 .chip .cl{display:block;color:var(--muted);font-size:11px;margin-top:1px}
 .open{font-weight:700;color:var(--c);font-size:13px}
-.frm{display:none;width:100%;height:calc(100vh - 64px);border:none;background:#fff}
+.frm{display:none;width:100%;height:100%;border:none;background:#fff}
 .frm.active{display:block}
 .foot{text-align:center;color:var(--muted);font-size:12px;padding:18px 0}
+.footer{flex:0 0 auto;display:flex;flex-wrap:wrap;justify-content:center;gap:6px 20px;background:#fff;border-top:1px solid var(--line);color:var(--muted);font-size:12px;padding:10px 16px}
+.footer b{color:var(--navy2)}
 </style>
 </head>
 <body>
@@ -52,6 +57,7 @@ body{margin:0;font-family:'Segoe UI',Arial,sans-serif;background:var(--bg);color
   <nav class="nav"><button class="nav-btn active" data-p="0">Dashboard</button><button class="nav-btn" data-p="1"><span class="nb-num">1</span>Customer Understanding</button><button class="nav-btn" data-p="2"><span class="nb-num">2</span>Survey Design</button><button class="nav-btn" data-p="3"><span class="nb-num">3</span>Geography & Demography</button><button class="nav-btn" data-p="4"><span class="nb-num">4</span>ROI & Business Case</button></nav>
 </header>
 
+<main class="main">
 <div class="panel active" id="panel-0">
   <div class="wrap">
     <div class="kpis"><div class="kpi"><div class="v">5,730</div><div class="l">Customers</div></div><div class="kpi"><div class="v">Tk 2,673 Cr</div><div class="l">Revenue</div></div><div class="kpi"><div class="v">2.05 M MT</div><div class="l">Volume</div></div><div class="kpi"><div class="v">19</div><div class="l">SBUs</div></div><div class="kpi"><div class="v">600</div><div class="l">Survey sample</div></div><div class="kpi"><div class="v">Tk 25 Cr</div><div class="l">Base-case annual profit</div></div></div>
@@ -1424,6 +1430,12 @@ el(&#x27;kpis&#x27;).innerHTML = [
 &lt;/body&gt;
 &lt;/html&gt;
 "></iframe></div>
+</main>
+
+<footer class="footer">
+  <span><b>Prepared by</b> Strategic Planning &amp; Analysis, AKIJ Resource Ltd</span>
+  <span><b>Last updated</b> 10 September 2026</span>
+</footer>
 
 <script>
 const navBtns = document.querySelectorAll('.nav-btn');
