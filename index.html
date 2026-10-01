@@ -161,6 +161,7 @@ tr:hover td{background:#FFFFFF}
 #cTable .dgrp td .cnt{font-weight:400;opacity:.8;font-size:12px}
 #cTable .btgrp td{background:#ECF2F0;color:var(--navy);font-weight:700;text-align:left;padding:6px 12px;border-bottom:1px solid var(--line)}
 #cTable .btgrp td .cnt{font-weight:400;opacity:.75;font-size:12px}
+.cfchip{display:inline-block;margin-left:8px;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#fdeee2;color:var(--warn);cursor:pointer}
 .bar{height:14px;border-radius:4px;background:var(--navy2);min-width:2px}
 .bar-track{background:#E8ECEC;border-radius:4px;overflow:hidden}
 .barchart{width:100%}
@@ -231,10 +232,7 @@ input[type=text]{min-width:260px}
   &lt;div class=&quot;kpis&quot; id=&quot;kpis&quot;&gt;&lt;/div&gt;
   &lt;div class=&quot;tabs&quot; id=&quot;tabs&quot;&gt;
     &lt;div class=&quot;tab active&quot; data-t=&quot;overview&quot;&gt;Overview&lt;/div&gt;
-    &lt;div class=&quot;tab&quot; data-t=&quot;demography&quot;&gt;Demography&lt;/div&gt;
-    &lt;div class=&quot;tab&quot; data-t=&quot;behavior&quot;&gt;Buying Behavior&lt;/div&gt;
-    &lt;div class=&quot;tab&quot; data-t=&quot;timeseries&quot;&gt;Time Series&lt;/div&gt;
-    &lt;div class=&quot;tab&quot; data-t=&quot;customers&quot;&gt;Customer Directory&lt;/div&gt;
+    &lt;div class=&quot;tab&quot; data-t=&quot;demography&quot;&gt;Customer Demography&lt;/div&gt;
   &lt;/div&gt;
 
   &lt;div class=&quot;panel active&quot; id=&quot;p-overview&quot;&gt;
@@ -268,8 +266,11 @@ input[type=text]{min-width:260px}
         &lt;option value=&quot;party&quot;&gt;Party Status&lt;/option&gt;
         &lt;option value=&quot;credit&quot;&gt;Credit Facility&lt;/option&gt;
       &lt;/select&gt;
+      &lt;label&gt;Search&lt;/label&gt;
+      &lt;input type=&quot;text&quot; id=&quot;cSearch&quot; placeholder=&quot;customer name or code&quot;&gt;
+      &lt;button class=&quot;expbtn&quot; id=&quot;cExportCsv&quot; style=&quot;margin-left:auto&quot;&gt;Export CSV&lt;/button&gt;
+      &lt;button class=&quot;expbtn&quot; id=&quot;cExportPdf&quot;&gt;Export PDF&lt;/button&gt;
     &lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2 id=&quot;dTitle&quot;&gt;Demography&lt;/h2&gt;&lt;div id=&quot;dChart&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;div class=&quot;card&quot;&gt;
       &lt;div class=&quot;flex&quot; style=&quot;justify-content:space-between;margin-bottom:8px&quot;&gt;
         &lt;h2 style=&quot;margin:0&quot;&gt;Bangladesh map — customer spread&lt;/h2&gt;
@@ -281,7 +282,7 @@ input[type=text]{min-width:260px}
           &lt;button class=&quot;expbtn&quot; id=&quot;mapToggle&quot;&gt;Collapse map&lt;/button&gt;
         &lt;/div&gt;
       &lt;/div&gt;
-      &lt;div class=&quot;desc&quot;&gt;Click a district to drill into its territory / channel / party / credit mix. Hover for a quick summary. Colours reflect customer count under the current filter.&lt;/div&gt;
+      &lt;div class=&quot;desc&quot;&gt;Click a district to filter the directory below &amp;amp; drill into its territory / channel / party / credit mix. Hover for a quick summary. Colours reflect customer count under the current filter.&lt;/div&gt;
       &lt;div class=&quot;mappanel&quot; id=&quot;mapPanel&quot;&gt;
         &lt;div class=&quot;mapwrap&quot;&gt;
           &lt;div class=&quot;mapbox&quot; id=&quot;mapBox&quot;&gt;&lt;/div&gt;
@@ -291,47 +292,28 @@ input[type=text]{min-width:260px}
           &lt;/div&gt;
         &lt;/div&gt;
         &lt;div class=&quot;legend&quot; id=&quot;mapLegend&quot;&gt;&lt;/div&gt;
-        &lt;div class=&quot;small&quot; style=&quot;margin-top:6px&quot;&gt;District &amp; division boundaries © OpenStreetMap contributors (ODbL) via bangladesh-geojson.&lt;/div&gt;
+        &lt;div class=&quot;small&quot; style=&quot;margin-top:6px&quot;&gt;District &amp;amp; division boundaries © OpenStreetMap contributors (ODbL) via bangladesh-geojson.&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Customer directory&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Grouped by division (area) &amp;amp; business type (channel). &lt;span id=&quot;cFilter&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;desc&quot; id=&quot;cCount&quot;&gt;&lt;/div&gt;&lt;div style=&quot;overflow-x:auto;-webkit-overflow-scrolling:touch&quot;&gt;&lt;table id=&quot;cTable&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th&gt;Amount (Tk)&lt;/th&gt;&lt;th&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;&lt;h2 id=&quot;dTitle&quot;&gt;Demography&lt;/h2&gt;&lt;div id=&quot;dChart&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;div class=&quot;grid2&quot;&gt;
       &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;National — customer count by division-like region&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Raw region labels (top 25).&lt;/div&gt;&lt;div id=&quot;natRegion&quot;&gt;&lt;/div&gt;&lt;/div&gt;
       &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;National — distribution channel&lt;/h2&gt;&lt;div id=&quot;natChannel&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;/div&gt;
-  &lt;/div&gt;
-
-  &lt;div class=&quot;panel&quot; id=&quot;p-behavior&quot;&gt;
-    &lt;div class=&quot;flex&quot; style=&quot;margin-bottom:12px&quot;&gt;
-      &lt;label&gt;SBU filter&lt;/label&gt;
-      &lt;div class=&quot;multisel&quot; id=&quot;bSbuWrap&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;grid2&quot;&gt;
+      &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Buying frequency (orders per customer)&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Distinct delivery codes per customer over Jan–Aug.&lt;/div&gt;&lt;div id=&quot;bFreq&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+      &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Recency (days since last order, vs 31 Aug 2026)&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;How recently customers bought — proxy for active vs dormant base.&lt;/div&gt;&lt;div id=&quot;bRecency&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Buying frequency (orders per customer)&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Distinct delivery codes per customer over Jan–Aug.&lt;/div&gt;&lt;div id=&quot;bFreq&quot;&gt;&lt;/div&gt;&lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Recency (days since last order, vs 31 Aug 2026)&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;How recently customers bought — proxy for active vs dormant base.&lt;/div&gt;&lt;div id=&quot;bRecency&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Value concentration (Pareto)&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Share of revenue from the top customers in the selected scope.&lt;/div&gt;&lt;div id=&quot;bPareto&quot;&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;/div&gt;
-
-  &lt;div class=&quot;panel&quot; id=&quot;p-timeseries&quot;&gt;
-    &lt;div class=&quot;flex&quot; style=&quot;margin-bottom:12px&quot;&gt;
-      &lt;label&gt;SBU&lt;/label&gt;
-      &lt;div class=&quot;multisel&quot; id=&quot;tSbuWrap&quot;&gt;&lt;/div&gt;
-      &lt;label&gt;Metric&lt;/label&gt;
-      &lt;select id=&quot;tMetric&quot;&gt;&lt;option value=&quot;revenue&quot;&gt;Revenue (Tk)&lt;/option&gt;&lt;option value=&quot;volume&quot;&gt;Volume (ton)&lt;/option&gt;&lt;option value=&quot;customers&quot;&gt;Active customers&lt;/option&gt;&lt;/select&gt;
+    &lt;div class=&quot;card&quot;&gt;
+      &lt;div class=&quot;flex&quot; style=&quot;justify-content:space-between;margin-bottom:8px&quot;&gt;
+        &lt;h2 id=&quot;tTitle&quot;&gt;Monthly trend&lt;/h2&gt;
+        &lt;select id=&quot;tMetric&quot;&gt;&lt;option value=&quot;revenue&quot;&gt;Revenue (Tk)&lt;/option&gt;&lt;option value=&quot;volume&quot;&gt;Volume (ton)&lt;/option&gt;&lt;option value=&quot;customers&quot;&gt;Active customers&lt;/option&gt;&lt;/select&gt;
+      &lt;/div&gt;
+      &lt;div id=&quot;tChart&quot;&gt;&lt;/div&gt;
     &lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2 id=&quot;tTitle&quot;&gt;Monthly trend&lt;/h2&gt;&lt;div id=&quot;tChart&quot;&gt;&lt;/div&gt;&lt;/div&gt;
   &lt;/div&gt;
-
-  &lt;div class=&quot;panel&quot; id=&quot;p-customers&quot;&gt;
-    &lt;div class=&quot;flex&quot; style=&quot;margin-bottom:12px&quot;&gt;
-      &lt;label&gt;SBU&lt;/label&gt;
-      &lt;div class=&quot;multisel&quot; id=&quot;cSbuWrap&quot;&gt;&lt;/div&gt;
-      &lt;label&gt;Search&lt;/label&gt;
-      &lt;input type=&quot;text&quot; id=&quot;cSearch&quot; placeholder=&quot;customer name or code&quot;&gt;
-      &lt;button class=&quot;expbtn&quot; id=&quot;cExportCsv&quot; style=&quot;margin-left:auto&quot;&gt;Export CSV&lt;/button&gt;
-      &lt;button class=&quot;expbtn&quot; id=&quot;cExportPdf&quot;&gt;Export PDF&lt;/button&gt;
-    &lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Customer directory&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Grouped by division (area) &amp;amp; business type (channel).&lt;/div&gt;&lt;div class=&quot;desc&quot; id=&quot;cCount&quot;&gt;&lt;/div&gt;&lt;div style=&quot;overflow-x:auto;-webkit-overflow-scrolling:touch&quot;&gt;&lt;table id=&quot;cTable&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th&gt;Amount (Tk)&lt;/th&gt;&lt;th&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;
-  &lt;/div&gt;
-
   &lt;div class=&quot;foot&quot;&gt;AKIJ Resource · Strategic Planning &amp;amp; Analysis · Customer Understanding · Data source: customer statement workbooks Jan–Aug 2026&lt;/div&gt;
 &lt;/div&gt;
 
@@ -448,10 +430,8 @@ function initSbuMulti(wrapId, allLabel, onChange){
   return { getSels, setSels };
 }
 document.addEventListener(&#x27;click&#x27;, ()=&gt;{ document.querySelectorAll(&#x27;.mspanel.open&#x27;).forEach(p=&gt;p.classList.remove(&#x27;open&#x27;)); });
-const dSbuSel = initSbuMulti(&#x27;dSbuWrap&#x27;,&#x27;All SBUs&#x27;, refreshDemo);
-const bSbuSel = initSbuMulti(&#x27;bSbuWrap&#x27;,&#x27;All SBUs&#x27;, refreshBeh);
-const tSbuSel = initSbuMulti(&#x27;tSbuWrap&#x27;,&#x27;All SBUs&#x27;, refreshTs);
-const cSbuSel = initSbuMulti(&#x27;cSbuWrap&#x27;,&#x27;All SBUs&#x27;, refreshCust);
+function refreshAll(){ refreshDemo(); refreshBeh(); refreshTs(); refreshCust(); }
+const dSbuSel = initSbuMulti(&#x27;dSbuWrap&#x27;,&#x27;All SBUs&#x27;, refreshAll);
 
 function refreshDemo(){
   const sels = dSbuSel.getSels(), dim = el(&#x27;dDim&#x27;).value;
@@ -534,9 +514,11 @@ function renderMap(sels, dim){
     };
     p.onmouseleave = ()=&gt;{ el(&#x27;mapTip&#x27;).style.display=&#x27;none&#x27;; };
     p.onclick = ()=&gt;{
-      selectedRegion = p.dataset.reg;
+      const id = p.dataset.reg;
+      selectedRegion = (selectedRegion===id ? null : id);
       el(&#x27;mapTip&#x27;).style.display=&#x27;none&#x27;;
       drillRegion(sels, dim);
+      refreshCust();
     };
   });
 }
@@ -554,14 +536,14 @@ function drillRegion(sels, dim){
   head.textContent = d.name + &#x27; &#x27; + unit + &#x27; — &#x27; + fmtNum(custs.length) + &#x27; customers · &#x27; + fmtTk(rev) + &#x27; · &#x27; + fmtTon(ton) + &#x27; ton&#x27;;
   head.style.fontSize=&#x27;13px&#x27;;
 }
-el(&#x27;mapLevel&#x27;).onchange = ()=&gt;{ mapLevel = el(&#x27;mapLevel&#x27;).value; selectedRegion = null; el(&#x27;mapDrillTitle&#x27;).textContent=&#x27;No selection&#x27;; el(&#x27;mapDrill&#x27;).innerHTML=&#x27;&lt;div class=&quot;desc&quot;&gt;Click a region on the map to see its details here.&lt;/div&gt;&#x27;; buildSvg(); refreshDemo(); };
+el(&#x27;mapLevel&#x27;).onchange = ()=&gt;{ mapLevel = el(&#x27;mapLevel&#x27;).value; selectedRegion = null; el(&#x27;mapDrillTitle&#x27;).textContent=&#x27;No selection&#x27;; el(&#x27;mapDrill&#x27;).innerHTML=&#x27;&lt;div class=&quot;desc&quot;&gt;Click a region on the map to see its details here.&lt;/div&gt;&#x27;; buildSvg(); refreshDemo(); refreshCust(); };
 el(&#x27;mapToggle&#x27;).onclick = ()=&gt;{
   const p = el(&#x27;mapPanel&#x27;);
   const collapsed = p.classList.toggle(&#x27;collapsed&#x27;);
   el(&#x27;mapToggle&#x27;).textContent = collapsed ? &#x27;Expand map&#x27; : &#x27;Collapse map&#x27;;
 };
 buildSvg();
-refreshDemo();
+refreshAll();
 
 // behavior
 function sumBeh(sbus){
@@ -570,7 +552,7 @@ function sumBeh(sbus){
   return {freq, rec};
 }
 function refreshBeh(){
-  const sbus = scopeSbus(bSbuSel.getSels());
+  const sbus = scopeSbus(dSbuSel.getSels());
   const beh = sumBeh(sbus);
   const order = [&#x27;1 order&#x27;,&#x27;2-3 orders&#x27;,&#x27;4-6 orders&#x27;,&#x27;7-12 orders&#x27;,&#x27;&gt;12 orders&#x27;];
   const freqOrdered = {}; order.forEach(k=&gt;{ if(beh.freq[k]) freqOrdered[k]=beh.freq[k]; });
@@ -587,8 +569,6 @@ function refreshBeh(){
   el(&#x27;bPareto&#x27;).innerHTML = `&lt;div class=&quot;desc&quot;&gt;Top 20% of customers generate ~${out[1]?out[1].revPct:&#x27;–&#x27;}% of revenue.&lt;/div&gt;` +
     out.map(o=&gt;`&lt;div class=&quot;brow&quot;&gt;&lt;div class=&quot;nm&quot;&gt;Top ${o.custPct}% of customers&lt;/div&gt;&lt;div class=&quot;bar-track&quot; style=&quot;flex:1&quot;&gt;&lt;div class=&quot;bar&quot; style=&quot;width:${o.revPct}%;background:var(--accent)&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;vl&quot;&gt;${o.revPct}% of revenue&lt;/div&gt;&lt;/div&gt;`).join(&#x27;&#x27;);
 }
-refreshBeh();
-
 // time series
 function tsData(sels, metric){
   const map={};
@@ -596,7 +576,7 @@ function tsData(sels, metric){
   return Object.entries(map).sort();
 }
 function refreshTs(){
-  const sels=tSbuSel.getSels(), metric=el(&#x27;tMetric&#x27;).value;
+  const sels=dSbuSel.getSels(), metric=el(&#x27;tMetric&#x27;).value;
   el(&#x27;tTitle&#x27;).textContent=&#x27;Monthly &#x27;+metric+&#x27; — &#x27;+selectionLabel(sels);
   const data = tsData(sels, metric);
   const mx = Math.max(...data.map(d=&gt;d[1]),1);
@@ -605,14 +585,15 @@ function refreshTs(){
     return `&lt;div class=&quot;brow&quot;&gt;&lt;div class=&quot;nm&quot;&gt;${m}&lt;/div&gt;&lt;div class=&quot;bar-track&quot; style=&quot;flex:1&quot;&gt;&lt;div class=&quot;bar&quot; style=&quot;width:${pct}%&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;vl&quot;&gt;${metric===&#x27;customers&#x27;?fmtNum(v):(metric===&#x27;revenue&#x27;?fmtTk(v):fmtTon(v))}&lt;/div&gt;&lt;/div&gt;`;
   }).join(&#x27;&#x27;);
 }
-el(&#x27;tMetric&#x27;).onchange=refreshTs; refreshTs();
+el(&#x27;tMetric&#x27;).onchange=refreshTs;
 
 // customer directory
 function custRows(){
-  const sels=cSbuSel.getSels(), q=(el(&#x27;cSearch&#x27;).value||&#x27;&#x27;).toLowerCase();
+  const sels=dSbuSel.getSels(), q=(el(&#x27;cSearch&#x27;).value||&#x27;&#x27;).toLowerCase();
   let rows=[];
-  scopeSbus(sels).forEach(s=&gt;{(s.customers||[]).forEach(c=&gt;{ rows.push({sbu:s.name,...c});});});
+  scopeSbus(sels).forEach(s=&gt;{(s.customers||[]).forEach(c=&gt;{ rows.push({sbu:s.name,...c,district:DIST[c.code]||null});});});
   if(q){ rows=rows.filter(c=&gt;c.name.toLowerCase().includes(q)||c.code.includes(q)); }
+  if(selectedRegion){ rows=rows.filter(c=&gt;regionId(c)===selectedRegion); }
   rows.sort((a,b)=&gt;b.amount-a.amount);
   return rows;
 }
@@ -634,7 +615,14 @@ function custGroups(rows){
 }
 function refreshCust(){
   const rows=custRows();
-  el(&#x27;cCount&#x27;).textContent = rows.length + &#x27; customers&#x27; + (cSbuSel.getSels().includes(&#x27;__ALL__&#x27;)?&#x27; (across all SBUs)&#x27;:&#x27;&#x27;);
+  const unit = mapLevel===&#x27;division&#x27; ? &#x27;division&#x27; : &#x27;district&#x27;;
+  if(selectedRegion){
+    el(&#x27;cFilter&#x27;).innerHTML = `&lt;span class=&quot;cfchip&quot;&gt;${selectedRegion} ${unit} — clear ✕&lt;/span&gt;`;
+    el(&#x27;cFilter&#x27;).querySelector(&#x27;.cfchip&#x27;).onclick = ()=&gt;{ selectedRegion=null; el(&#x27;mapDrillTitle&#x27;).textContent=&#x27;No &#x27;+unit+&#x27; selected&#x27;; el(&#x27;mapDrill&#x27;).innerHTML=&#x27;&lt;div class=&quot;desc&quot;&gt;Click a district on the map to see its details here.&lt;/div&gt;&#x27;; refreshAll(); };
+  } else {
+    el(&#x27;cFilter&#x27;).innerHTML = &#x27;&#x27;;
+  }
+  el(&#x27;cCount&#x27;).textContent = rows.length + &#x27; customers&#x27; + (dSbuSel.getSels().includes(&#x27;__ALL__&#x27;)?&#x27; (across all SBUs)&#x27;:&#x27;&#x27;);
   const {groups, divOrder}=custGroups(rows.slice(0,500));
   const tb=el(&#x27;cTable&#x27;).querySelector(&#x27;tbody&#x27;);
   let h=&#x27;&#x27;;
@@ -652,7 +640,7 @@ function refreshCust(){
   });
   tb.innerHTML=h || &#x27;&lt;tr&gt;&lt;td colspan=&quot;7&quot;&gt;No customers match&lt;/td&gt;&lt;/tr&gt;&#x27;;
 }
-el(&#x27;cSearch&#x27;).oninput=refreshCust; refreshCust();
+el(&#x27;cSearch&#x27;).oninput=refreshCust;
 
 // export (business-wise)
 function csvCell(v){
@@ -713,11 +701,11 @@ sbuTb.addEventListener(&#x27;click&#x27;, e=&gt;{
   const tr = e.target.closest(&#x27;tr&#x27;); if(!tr) return;
   const i = tr.dataset.i; if(i===undefined) return;
   const name = SBUROWS[i].name;
-  cSbuSel.setSels([name]); refreshCust();
+  dSbuSel.setSels([name]); refreshAll();
   document.querySelectorAll(&#x27;.tab&#x27;).forEach(x=&gt;x.classList.remove(&#x27;active&#x27;));
   document.querySelectorAll(&#x27;.panel&#x27;).forEach(x=&gt;x.classList.remove(&#x27;active&#x27;));
-  document.querySelector(&#x27;.tab[data-t=&quot;customers&quot;]&#x27;).classList.add(&#x27;active&#x27;);
-  el(&#x27;p-customers&#x27;).classList.add(&#x27;active&#x27;);
+  document.querySelector(&#x27;.tab[data-t=&quot;demography&quot;]&#x27;).classList.add(&#x27;active&#x27;);
+  el(&#x27;p-demography&#x27;).classList.add(&#x27;active&#x27;);
   window.scrollTo(0,0);
 });
 &lt;/script&gt;
