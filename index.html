@@ -295,7 +295,7 @@ input[type=text]{min-width:260px}
         &lt;div class=&quot;small&quot; style=&quot;margin-top:6px&quot;&gt;District &amp;amp; division boundaries © OpenStreetMap contributors (ODbL) via bangladesh-geojson.&lt;/div&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Customer directory&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Grouped by division (area) &amp;amp; business type (channel). &lt;span id=&quot;cFilter&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;desc&quot; id=&quot;cCount&quot;&gt;&lt;/div&gt;&lt;div style=&quot;overflow-x:auto;-webkit-overflow-scrolling:touch&quot;&gt;&lt;table id=&quot;cTable&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th&gt;Amount (Tk)&lt;/th&gt;&lt;th&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Customer directory&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Grouped by geography (district / division) &amp;amp; business type (channel). &lt;span id=&quot;cFilter&quot;&gt;&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;desc&quot; id=&quot;cCount&quot;&gt;&lt;/div&gt;&lt;div style=&quot;overflow-x:auto;-webkit-overflow-scrolling:touch&quot;&gt;&lt;table id=&quot;cTable&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th&gt;Amount (Tk)&lt;/th&gt;&lt;th&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;div class=&quot;card&quot;&gt;&lt;h2 id=&quot;dTitle&quot;&gt;Demography&lt;/h2&gt;&lt;div id=&quot;dChart&quot;&gt;&lt;/div&gt;&lt;/div&gt;
     &lt;div class=&quot;grid2&quot;&gt;
       &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;National — customer count by division-like region&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Raw region labels (top 25).&lt;/div&gt;&lt;div id=&quot;natRegion&quot;&gt;&lt;/div&gt;&lt;/div&gt;
@@ -598,9 +598,10 @@ function custRows(){
   return rows;
 }
 function custGroups(rows){
+  const byDistrict = mapLevel===&#x27;district&#x27;;
   const groups={};
   rows.forEach(c=&gt;{
-    const d=c.division||&#x27;Unmapped&#x27;, bt=c.channel||&#x27;Unspecified&#x27;;
+    const d=(byDistrict ? (c.district||&#x27;Unmapped&#x27;) : (c.division||&#x27;Unmapped&#x27;)), bt=c.channel||&#x27;Unspecified&#x27;;
     groups[d]=groups[d]||{};
     groups[d][bt]=groups[d][bt]||[];
     groups[d][bt].push(c);
@@ -660,10 +661,10 @@ function businessRows(){
 }
 function exportCsv(){
   const rows=businessRows();
-  const head=[&#x27;Business Type&#x27;,&#x27;Division&#x27;,&#x27;Customer&#x27;,&#x27;Code&#x27;,&#x27;Party&#x27;,&#x27;Credit&#x27;,&#x27;Territory&#x27;,&#x27;Amount (Tk)&#x27;,&#x27;Volume (ton)&#x27;];
+  const head=[&#x27;Business Type&#x27;,&#x27;Division&#x27;,&#x27;District&#x27;,&#x27;Customer&#x27;,&#x27;Code&#x27;,&#x27;Party&#x27;,&#x27;Credit&#x27;,&#x27;Territory&#x27;,&#x27;Amount (Tk)&#x27;,&#x27;Volume (ton)&#x27;];
   const lines=[head.map(csvCell).join(&#x27;,&#x27;)];
   rows.forEach(c=&gt;{
-    lines.push([c.channel||&#x27;Unspecified&#x27;, c.division||&#x27;Unmapped&#x27;, c.name, c.code, c.party||&#x27;&#x27;, c.credit||&#x27;&#x27;, c.territory||&#x27;&#x27;, (c.amount||0).toFixed(2), (c.ton||0).toFixed(2)].map(csvCell).join(&#x27;,&#x27;));
+    lines.push([c.channel||&#x27;Unspecified&#x27;, c.division||&#x27;Unmapped&#x27;, c.district||&#x27;Unmapped&#x27;, c.name, c.code, c.party||&#x27;&#x27;, c.credit||&#x27;&#x27;, c.territory||&#x27;&#x27;, (c.amount||0).toFixed(2), (c.ton||0).toFixed(2)].map(csvCell).join(&#x27;,&#x27;));
   });
   const csv=lines.join(&#x27;\r\n&#x27;);
   const blob=new Blob([&quot;\ufeff&quot;+csv], {type:&#x27;text/csv;charset=utf-8;&#x27;});
@@ -681,9 +682,9 @@ function exportPdf(){
   btOrder.forEach(bt=&gt;{
     const list=rows.filter(c=&gt;(c.channel||&#x27;Unspecified&#x27;)===bt);
     body+=`&lt;h2&gt;${esc(bt)} &lt;small&gt;(${fmtNum(list.length)} customers)&lt;/small&gt;&lt;/h2&gt;`;
-    body+=`&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Division&lt;/th&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th class=&quot;r&quot;&gt;Amount (Tk)&lt;/th&gt;&lt;th class=&quot;r&quot;&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;`;
+    body+=`&lt;table&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Division&lt;/th&gt;&lt;th&gt;District&lt;/th&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th class=&quot;r&quot;&gt;Amount (Tk)&lt;/th&gt;&lt;th class=&quot;r&quot;&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;`;
     list.forEach(c=&gt;{
-      body+=`&lt;tr&gt;&lt;td&gt;${esc(c.division||&#x27;Unmapped&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.name)}&lt;/td&gt;&lt;td&gt;${esc(c.code)}&lt;/td&gt;&lt;td&gt;${esc(c.party||&#x27;&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.credit||&#x27;&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.territory||&#x27;&#x27;)}&lt;/td&gt;&lt;td class=&quot;r&quot;&gt;${fmtNum(c.amount)}&lt;/td&gt;&lt;td class=&quot;r&quot;&gt;${fmtNum(c.ton)}&lt;/td&gt;&lt;/tr&gt;`;
+      body+=`&lt;tr&gt;&lt;td&gt;${esc(c.division||&#x27;Unmapped&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.district||&#x27;Unmapped&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.name)}&lt;/td&gt;&lt;td&gt;${esc(c.code)}&lt;/td&gt;&lt;td&gt;${esc(c.party||&#x27;&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.credit||&#x27;&#x27;)}&lt;/td&gt;&lt;td&gt;${esc(c.territory||&#x27;&#x27;)}&lt;/td&gt;&lt;td class=&quot;r&quot;&gt;${fmtNum(c.amount)}&lt;/td&gt;&lt;td class=&quot;r&quot;&gt;${fmtNum(c.ton)}&lt;/td&gt;&lt;/tr&gt;`;
     });
     body+=`&lt;/tbody&gt;&lt;/table&gt;`;
   });
