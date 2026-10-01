@@ -874,6 +874,12 @@ el(&#x27;kpis&#x27;).innerHTML = [
     &lt;div class=&quot;toolbar&quot;&gt;
       &lt;button class=&quot;cta&quot; id=&quot;printQ&quot;&gt;Print / Save PDF&lt;/button&gt;
       &lt;span class=&quot;pill&quot;&gt;${D.questionnaire.length} sections · ${D.questionnaire.reduce((a,s)=&gt;a+s.q.length,0)} questions&lt;/span&gt;
+      &lt;label style=&quot;margin-left:auto;display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--navy)&quot;&gt;Survey type
+        &lt;select id=&quot;qType&quot; style=&quot;padding:7px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#fff&quot;&gt;
+          &lt;option value=&quot;all&quot;&gt;All types&lt;/option&gt;
+          ${TYPE_ORDER.map(t=&gt;`&lt;option value=&quot;${t}&quot;&gt;${t}&lt;/option&gt;`).join(&#x27;&#x27;)}
+        &lt;/select&gt;
+      &lt;/label&gt;
     &lt;/div&gt;
     &lt;div class=&quot;desc&quot;&gt;Sections A–F form the common core (identity → behaviour → satisfaction → gaps → loyalty → digital readiness), asked of every customer. Each interview then completes one type module below, selected automatically by customer type. Approximate interview time: &lt;b&gt;15–20 minutes&lt;/b&gt;.&lt;/div&gt;
   &lt;/div&gt;
@@ -886,15 +892,23 @@ el(&#x27;kpis&#x27;).innerHTML = [
     &lt;/div&gt;`).join(&#x27;&#x27;)}
   &lt;div class=&quot;card&quot; style=&quot;margin-top:4px&quot;&gt;
     &lt;h3&gt;Type-specific modules (survey type = customer type)&lt;/h3&gt;
-    &lt;div class=&quot;desc&quot;&gt;A B2B customer answers the B2B module, a distributor the Distributor module, a dealer the Dealer module, and an end consumer the B2C module. The customer type is pre-filled from the AKIJ DWH and confirmed at interview (Section A).&lt;/div&gt;
+    &lt;div class=&quot;desc&quot;&gt;A B2B customer answers the B2B module, a distributor the Distributor module, a dealer the Dealer module, and an end consumer the B2C module. The customer type is pre-filled from the AKIJ DWH and confirmed at interview (Section A). Select a survey type above to preview its module.&lt;/div&gt;
   &lt;/div&gt;
-  ${D.type_modules.map(m=&gt;`
+  &lt;div id=&quot;typeMods&quot;&gt;&lt;/div&gt;`;
+  const typeModuleHtml = m=&gt;`
     &lt;div class=&quot;qsec&quot;&gt;
       &lt;div class=&quot;qhead&quot;&gt;&lt;div class=&quot;id&quot;&gt;${m.id}&lt;/div&gt;&lt;div class=&quot;t&quot;&gt;${m.title} &lt;span class=&quot;tb ${m.type}&quot;&gt;${m.type}&lt;/span&gt;&lt;/div&gt;&lt;div class=&quot;i&quot;&gt;${m.intro}&lt;/div&gt;&lt;/div&gt;
       &lt;div class=&quot;qbody&quot;&gt;
         ${m.q.map((x,i)=&gt;`&lt;div class=&quot;qitem&quot;&gt;&lt;div class=&quot;q&quot;&gt;${i+1}. ${x.q} &lt;span class=&quot;type&quot;&gt;${typeLabel[x.type]||x.type}&lt;/span&gt;&lt;/div&gt;${x.opts?`&lt;div class=&quot;opts&quot;&gt;${x.opts.join(&#x27; · &#x27;)}&lt;/div&gt;`:&#x27;&#x27;}&lt;/div&gt;`).join(&#x27;&#x27;)}
       &lt;/div&gt;
-    &lt;/div&gt;`).join(&#x27;&#x27;)}`;
+    &lt;/div&gt;`;
+  function renderTypeMods(){
+    const v = el(&#x27;qType&#x27;).value;
+    const mods = v===&#x27;all&#x27; ? D.type_modules : D.type_modules.filter(m=&gt;m.type===v);
+    el(&#x27;typeMods&#x27;).innerHTML = mods.map(typeModuleHtml).join(&#x27;&#x27;);
+  }
+  el(&#x27;qType&#x27;).onchange = renderTypeMods;
+  renderTypeMods();
   el(&#x27;printQ&#x27;).onclick = ()=&gt;{ window.print(); };
 })();
 
