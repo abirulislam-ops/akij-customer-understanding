@@ -157,6 +157,10 @@ th{background:#ECF2F0;color:var(--navy);font-weight:700;position:sticky;top:0}
 td:first-child,th:first-child{text-align:left}
 tr:hover td{background:#FFFFFF}
 .num{font-variant-numeric:tabular-nums}
+#cTable .dgrp td{background:var(--navy);color:#fff;font-weight:700;text-align:left;padding:8px 12px;border-bottom:2px solid var(--navy2)}
+#cTable .dgrp td .cnt{font-weight:400;opacity:.8;font-size:12px}
+#cTable .btgrp td{background:#ECF2F0;color:var(--navy);font-weight:700;text-align:left;padding:6px 12px;border-bottom:1px solid var(--line)}
+#cTable .btgrp td .cnt{font-weight:400;opacity:.75;font-size:12px}
 .bar{height:14px;border-radius:4px;background:var(--navy2);min-width:2px}
 .bar-track{background:#E8ECEC;border-radius:4px;overflow:hidden}
 .barchart{width:100%}
@@ -323,7 +327,7 @@ input[type=text]{min-width:260px}
       &lt;label&gt;Search&lt;/label&gt;
       &lt;input type=&quot;text&quot; id=&quot;cSearch&quot; placeholder=&quot;customer name or code&quot;&gt;
     &lt;/div&gt;
-    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Customer directory&lt;/h2&gt;&lt;div class=&quot;desc&quot; id=&quot;cCount&quot;&gt;&lt;/div&gt;&lt;table id=&quot;cTable&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Channel&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Region&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th&gt;Amount (Tk)&lt;/th&gt;&lt;th&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+    &lt;div class=&quot;card&quot;&gt;&lt;h2&gt;Customer directory&lt;/h2&gt;&lt;div class=&quot;desc&quot;&gt;Grouped by division (area) &amp;amp; business type (channel).&lt;/div&gt;&lt;div class=&quot;desc&quot; id=&quot;cCount&quot;&gt;&lt;/div&gt;&lt;div style=&quot;overflow-x:auto;-webkit-overflow-scrolling:touch&quot;&gt;&lt;table id=&quot;cTable&quot;&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Customer&lt;/th&gt;&lt;th&gt;Code&lt;/th&gt;&lt;th&gt;Party&lt;/th&gt;&lt;th&gt;Credit&lt;/th&gt;&lt;th&gt;Territory&lt;/th&gt;&lt;th&gt;Amount (Tk)&lt;/th&gt;&lt;th&gt;Volume (ton)&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;&lt;/div&gt;
   &lt;/div&gt;
 
   &lt;div class=&quot;foot&quot;&gt;AKIJ Resource · Strategic Planning &amp;amp; Analysis · Customer Understanding · Data source: customer statement workbooks Jan–Aug 2026&lt;/div&gt;
@@ -609,10 +613,34 @@ function refreshCust(){
   if(q){ rows=rows.filter(c=&gt;c.name.toLowerCase().includes(q)||c.code.includes(q)); }
   rows.sort((a,b)=&gt;b.amount-a.amount);
   el(&#x27;cCount&#x27;).textContent = rows.length + &#x27; customers&#x27; + (sels.includes(&#x27;__ALL__&#x27;)?&#x27; (across all SBUs)&#x27;:&#x27;&#x27;);
+  const groups={};
+  rows.slice(0,500).forEach(c=&gt;{
+    const d=c.division||&#x27;Unmapped&#x27;, bt=c.channel||&#x27;Unspecified&#x27;;
+    groups[d]=groups[d]||{};
+    groups[d][bt]=groups[d][bt]||[];
+    groups[d][bt].push(c);
+  });
+  const divOrder=Object.keys(groups).sort((a,b)=&gt;{
+    if(a===&#x27;Unmapped&#x27;) return 1; if(b===&#x27;Unmapped&#x27;) return -1;
+    const nA=Object.values(groups[a]).reduce((x,v)=&gt;x+v.length,0);
+    const nB=Object.values(groups[b]).reduce((x,v)=&gt;x+v.length,0);
+    return nB-nA;
+  });
   const tb=el(&#x27;cTable&#x27;).querySelector(&#x27;tbody&#x27;);
-  tb.innerHTML = rows.slice(0,500).map(c=&gt;`&lt;tr&gt;
-    &lt;td&gt;${c.name}&lt;/td&gt;&lt;td&gt;${c.code}&lt;/td&gt;&lt;td&gt;${c.channel}&lt;/td&gt;&lt;td&gt;${c.party}&lt;/td&gt;&lt;td&gt;${c.credit}&lt;/td&gt;
-    &lt;td&gt;${c.region}&lt;/td&gt;&lt;td&gt;${c.territory}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${fmtNum(c.amount)}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${fmtNum(c.ton)}&lt;/td&gt;&lt;/tr&gt;`).join(&#x27;&#x27;) || &#x27;&lt;tr&gt;&lt;td colspan=&quot;9&quot;&gt;No customers match&lt;/td&gt;&lt;/tr&gt;&#x27;;
+  let h=&#x27;&#x27;;
+  divOrder.forEach(d=&gt;{
+    const bts=groups[d];
+    const btOrder=Object.keys(bts).sort((a,b)=&gt;bts[b].length-bts[a].length);
+    const dCount=btOrder.reduce((x,b)=&gt;x+bts[b].length,0);
+    h+=`&lt;tr class=&quot;dgrp&quot;&gt;&lt;td colspan=&quot;7&quot;&gt;${d}&lt;span class=&quot;cnt&quot;&gt; (${fmtNum(dCount)} customers)&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;`;
+    btOrder.forEach(bt=&gt;{
+      h+=`&lt;tr class=&quot;btgrp&quot;&gt;&lt;td colspan=&quot;7&quot;&gt;${bt}&lt;span class=&quot;cnt&quot;&gt; (${fmtNum(bts[bt].length)})&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;`;
+      bts[bt].forEach(c=&gt;{
+        h+=`&lt;tr&gt;&lt;td&gt;${c.name}&lt;/td&gt;&lt;td&gt;${c.code}&lt;/td&gt;&lt;td&gt;${c.party}&lt;/td&gt;&lt;td&gt;${c.credit}&lt;/td&gt;&lt;td&gt;${c.territory}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${fmtNum(c.amount)}&lt;/td&gt;&lt;td class=&quot;num&quot;&gt;${fmtNum(c.ton)}&lt;/td&gt;&lt;/tr&gt;`;
+      });
+    });
+  });
+  tb.innerHTML=h || &#x27;&lt;tr&gt;&lt;td colspan=&quot;7&quot;&gt;No customers match&lt;/td&gt;&lt;/tr&gt;&#x27;;
 }
 el(&#x27;cSearch&#x27;).oninput=refreshCust; refreshCust();
 
