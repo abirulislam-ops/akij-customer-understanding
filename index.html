@@ -326,6 +326,7 @@ const fmtTk = n =&gt; (n/1e7).toFixed(2) + &#x27; cr&#x27;;
 const fmtNum = n =&gt; n.toLocaleString(&#x27;en-IN&#x27;);
 const fmtTon = n =&gt; n.toLocaleString(&#x27;en-IN&#x27;, {maximumFractionDigits:0});
 const fmtPrice = n =&gt; &#x27;Tk &#x27; + n.toLocaleString(&#x27;en-IN&#x27;, {maximumFractionDigits:0});
+const escHtml = v =&gt; String(v==null?&#x27;&#x27;:v).replace(/&amp;/g,&#x27;&amp;amp;&#x27;).replace(/&lt;/g,&#x27;&amp;lt;&#x27;).replace(/&gt;/g,&#x27;&amp;gt;&#x27;).replace(/&quot;/g,&#x27;&amp;quot;&#x27;);
 
 function el(id){return document.getElementById(id)}
 function kpi(label,val,sub){return `&lt;div class=&quot;kpi&quot;&gt;&lt;div class=&quot;lbl&quot;&gt;${label}&lt;/div&gt;&lt;div class=&quot;val&quot;&gt;${val}&lt;/div&gt;&lt;div class=&quot;sub&quot;&gt;${sub||&#x27;&#x27;}&lt;/div&gt;&lt;/div&gt;`}
@@ -591,7 +592,6 @@ function refreshTs(){
 el(&#x27;tMetric&#x27;).onchange=refreshTs;
 
 // customer directory
-const escHtml = v =&gt; String(v==null?&#x27;&#x27;:v).replace(/&amp;/g,&#x27;&amp;amp;&#x27;).replace(/&lt;/g,&#x27;&amp;lt;&#x27;).replace(/&gt;/g,&#x27;&amp;gt;&#x27;).replace(/&quot;/g,&#x27;&amp;quot;&#x27;);
 function custRows(){
   const sels=dSbuSel.getSels(), q=(el(&#x27;cSearch&#x27;).value||&#x27;&#x27;).toLowerCase();
   let rows=[];
